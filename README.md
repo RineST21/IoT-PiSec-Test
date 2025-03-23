@@ -24,7 +24,7 @@ The system collects temperature, humidity, and pressure data using an ESP8266 mi
 * Flask
 * MySQl Server or another solution
 * MySQL Connector for Python
-* Apache www server
+* Apache server
 
 #### Client Side (ESP8266)
 * Arduino IDE
