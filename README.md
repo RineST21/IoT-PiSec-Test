@@ -215,6 +215,7 @@ source /var/www/html/website/.venv/bin/activate
 
 5. Install Python dependencies:
 ```
+pip install Flask
 pip install flask mysql-connector-python
 ```
 
