@@ -5,6 +5,7 @@
 #define DHT11_PIN 5      
 #define DHT_TYPE DHT11   
 
+//change it to your WiFi configuration!
 const char* ssid = "your_ssid";         
 const char* password = "your_password";         
 const char* serverIP = "your_ip_address";       
@@ -17,12 +18,12 @@ void setup() {
   dht.begin();
 
   WiFi.begin(ssid, password);
-  Serial.print("Łączenie z WiFi");
+  Serial.print("Connecting to WiFi");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-  Serial.println(" Połączono!");
+  Serial.println(" Connected!");
 }
 
 void loop() {
@@ -30,16 +31,16 @@ void loop() {
   float temperature = dht.readTemperature();
 
   if (!isnan(humidity) && !isnan(temperature)) {
-    Serial.print("Wilgotność: ");
+    Serial.print("Humidity: ");
     Serial.print(humidity);
-    Serial.print("%RH | Temperatura: ");
+    Serial.print("%RH | Temperature: ");
     Serial.print(temperature);
     Serial.println("°C ");
     if (WiFi.status() == WL_CONNECTED) {
       WiFiClient client;
 
       if (client.connect(serverIP, serverPort)) {
-        Serial.println("Połączono z serwerem.");
+        Serial.println("Connected to server.");
 
         String url = "/data?humidity=" + String(humidity) + "&temperature=" + String(temperature);
         client.print(String("GET ") + url + " HTTP/1.1\r\n" +
@@ -49,7 +50,7 @@ void loop() {
         unsigned long timeout = millis();
         while (client.available() == 0) {
           if (millis() - timeout > 5000) {
-            Serial.println(">>> Timeout klienta!");
+            Serial.println(">>> Client timeout!");
             client.stop();
             return;
           }
@@ -61,15 +62,15 @@ void loop() {
         }
 
         client.stop();
-        Serial.println("\nPołączenie zamknięte.");
+        Serial.println("\nConnection closed.");
       } else {
-        Serial.println("Nie udało się połączyć z serwerem.");
+        Serial.println("Failed to established connection.");
       }
     } else {
-      Serial.println("Brak połączenia WiFi.");
+      Serial.println("No connection to WiFi.");
     }
   } else {
-    Serial.println("Błąd odczytu z czujnika DHT!");
+    Serial.println("Error reading data from DHT!");
   }
 
   delay(5000); 
