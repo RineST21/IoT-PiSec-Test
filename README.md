@@ -1,6 +1,6 @@
 # IoT-PiSec-Test
 
-This project creates a weather monitoring system using the ESP8266 to collect data from the DHT11 and BMP280 sensors and the Raspberry Pi as a server for data storage and visualisation. It then tests its level of security at the level of database, communication etc...
+This project creates a weather monitoring system using the ESP8266 to collect data from the DHT11 and BMP280 sensors and the Raspberry Pi as a server for data storage and visualisation.
 
 ## Overview
 
