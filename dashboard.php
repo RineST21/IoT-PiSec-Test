@@ -7,6 +7,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit();
 }
 
+//Remember to change it!
 $host = 'localhost';
 $user = 'root';
 $password = 'raspberry';
@@ -14,13 +15,13 @@ $dbname = 'sensordata';
 
 $conn = new mysqli($host, $user, $password, $dbname);
 if ($conn->connect_error) {
-    die("Błąd połączenia: " . $conn->connect_error);
+    die("Connection error: " . $conn->connect_error);
 }
 
 $dhtQuery = "SELECT Date, Temperature, Humidity FROM DHT11_measurement";
 $dhtResult = $conn->query($dhtQuery);
 if (!$dhtResult) {
-    die("Błąd zapytania (DHT11): " . $conn->error);
+    die("Error query (DHT11): " . $conn->error);
 }
 
 $data = [];
@@ -32,7 +33,7 @@ while ($row = $dhtResult->fetch_assoc()) {
 $bmpQuery = "SELECT Date, Pressure FROM BMP280_measurement";
 $bmpResult = $conn->query($bmpQuery);
 if (!$bmpResult) {
-    die("Błąd zapytania (BMP280): " . $conn->error);
+    die("Error query (BMP280): " . $conn->error);
 }
 
 while ($row = $bmpResult->fetch_assoc()) {
@@ -125,14 +126,14 @@ $conn->close();
 </head>
 <body>
   <div class="dashboard-container">
-    <h1>Panel Czujników</h1>
+    <h1>Sensor DASHBOARD</h1>
     <table>
       <thead>
         <tr>
           <th class="numeric_2">Data</th>
-          <th>Temperatura (°C)</th>
-          <th>Wilgotność (%RH)</th>
-          <th>Ciśnienie (hPa)</th>
+          <th>Temperature (°C)</th>
+          <th>Humidity (%RH)</th>
+          <th>Pressure (hPa)</th>
         </tr>
       </thead>
       <tbody>
@@ -147,14 +148,14 @@ $conn->close();
                   echo "</tr>";
               }
           } else {
-              echo "<tr><td colspan='4'>Brak danych</td></tr>";
+              echo "<tr><td colspan='4'>No data</td></tr>";
           }
         ?>
       </tbody>
     </table>
     <div class="logout">
       <form action="logout.php" method="post">
-        <button type="submit">Wyloguj</button>
+        <button type="submit">Logout</button>
       </form>
     </div>
   </div>
