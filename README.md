@@ -127,6 +127,76 @@ GRANT ALL PRIVILEGES ON *.* TO 'your_username'@'localhost';
 mysql --user=your_username -p
 ```
 
+### Creating the Database Structure
+Follow these steps to create the required database and tables for the project:
+
+1. Log in to MySQL:
+```
+mysql -u your_username -p
+```
+
+2. Create the database:
+```
+CREATE DATABASE sensordata;
+USE sensordata;
+```
+
+3. Create the required tables:
+
+```sql
+-- Table for BMP280 pressure sensor measurements
+CREATE TABLE `BMP280_measurement` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Date` timestamp NULL DEFAULT current_timestamp(),
+  `Pressure` float NOT NULL,
+  PRIMARY KEY (`ID`)
+) 
+
+-- Table for DHT11 temperature and humidity sensor measurements
+CREATE TABLE `DHT11_measurement` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Date` timestamp NULL DEFAULT current_timestamp(),
+  `Temperature` float NOT NULL,
+  `Humidity` float NOT NULL,
+  PRIMARY KEY (`ID`)
+)
+
+-- Table for user authentication
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`)
+) 
+```
+
+4. Add an initial admin user (for testing purposes only, change this in production):
+```sql
+INSERT INTO `users` (`username`, `password`) VALUES ('admin', 'admin');
+```
+
+5. Verify the tables were created correctly:
+```sql
+SHOW TABLES;
+DESCRIBE BMP280_measurement;
+DESCRIBE DHT11_measurement;
+DESCRIBE users;
+```
+
+Alternatively, you can also use phpMyAdmin to create the database and tables:
+
+1. Open a web browser and navigate to http://[Raspberry_Pi_IP]/phpmyadmin
+2. Log in with your MySQL username and password
+3. Click "New" in the left sidebar to create a new database
+4. Enter "sensordata" as the database name and click "Create"
+5. Select the "sensordata" database from the left sidebar
+6. Click the "SQL" tab
+7. Copy and paste the SQL commands above into the SQL query window
+8. Click "Go" to execute the queries
+
+**Note on Security**: The current user table stores passwords in plain text, which is not secure for production. In a real-world application, you should use proper password hashing (e.g., bcrypt or Argon2).
+
 3. Create a website structure
 ```
 sudo mkdir /var/www/html/website
@@ -164,3 +234,9 @@ pip install flask mysql-connector-python
 * Check if MySQL service is running
 * Ensure the Flask application has the correct database credentials
 * Verify the ESP8266 can reach the Raspberry Pi's IP address
+
+### Database Issues
+* If you can't connect to the database, check if the MySQL service is running: `sudo systemctl status mysql`
+* Verify the database exists: `mysql -u username -p -e "SHOW DATABASES;"`
+* Check if the required tables exist: `mysql -u username -p -e "USE sensordata; SHOW TABLES;"`
+* Ensure the Flask application has the correct database credentials in its configuration
