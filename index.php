@@ -6,9 +6,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
 
-    $conn = new mysqli('localhost', 'root', 'raspberry', 'sensordata'); 
+    $conn = new mysqli('localhost', 'root', 'raspberry', 'sensordata'); //Remember to change it!
     if ($conn->connect_error) {
-        die("Błąd połączenia: " . $conn->connect_error);
+        die("Connection Error: " . $conn->connect_error);
     }
 
     $stmt = $conn->prepare("SELECT id FROM users WHERE username = ? AND password = ?");
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: dashboard.php');
         exit();
     } else {
-        $error = "Niepoprawna nazwa użytkownika lub hasło.";
+        $error = "Wrong username or password!.";
     }
     $stmt->close();
     $conn->close();
@@ -87,11 +87,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
   <div class="login-container">
-    <h2>Logowanie</h2>
+    <h2>Login panel</h2>
     <form method="post">
-      <input type="text" name="username" placeholder="Nazwa użytkownika" required>
-      <input type="password" name="password" placeholder="Hasło" required>
-      <button type="submit">Zaloguj się</button>
+      <input type="text" name="username" placeholder="Username" required>
+      <input type="password" name="password" placeholder="Password" required>
+      <button type="submit">Login</button>
     </form>
     <?php if (isset($error)): ?>
       <div class="error"><?php echo htmlspecialchars($error); ?></div>
