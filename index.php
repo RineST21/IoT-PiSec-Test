@@ -3,12 +3,10 @@ ini_set('display_errors', 1);
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Pobranie danych z formularza
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
 
-    // Połączenie z bazą danych sensordata
-    $conn = new mysqli('localhost', 'root', 'raspberry', 'sensordata');
+    $conn = new mysqli('localhost', 'root', 'raspberry', 'sensordata'); 
     if ($conn->connect_error) {
         die("Błąd połączenia: " . $conn->connect_error);
     }
