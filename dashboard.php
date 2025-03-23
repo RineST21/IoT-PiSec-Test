@@ -17,7 +17,6 @@ if ($conn->connect_error) {
     die("Błąd połączenia: " . $conn->connect_error);
 }
 
-// Pobieramy dane z DHT11
 $dhtQuery = "SELECT Date, Temperature, Humidity FROM DHT11_measurement";
 $dhtResult = $conn->query($dhtQuery);
 if (!$dhtResult) {
@@ -30,7 +29,6 @@ while ($row = $dhtResult->fetch_assoc()) {
     $data[$row['Date']]['Pressure'] = '';
 }
 
-// Pobieramy dane z BMP280
 $bmpQuery = "SELECT Date, Pressure FROM BMP280_measurement";
 $bmpResult = $conn->query($bmpQuery);
 if (!$bmpResult) {
