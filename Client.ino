@@ -5,9 +5,9 @@
 #define DHT11_PIN 5      
 #define DHT_TYPE DHT11   
 
-const char* ssid = "CGA2121_8EgD8ah";         
-const char* password = "X2EMZ5fZwZrBBnsCnQ";         
-const char* serverIP = "192.168.0.18";       
+const char* ssid = "your_ssid";         
+const char* password = "your_password";         
+const char* serverIP = "your_ip_address";       
 const int serverPort = 5000;                  
 
 DHT dht(DHT11_PIN, DHT_TYPE);
