@@ -65,7 +65,7 @@ To enable communication between your computer and the ESP8266:
 
 ## Setting Up the Raspberry Pi Server (database and www)
 
-### Finding Your Raspberry Pi's IP Address
+### Finding Your Raspberry Pi IP Address
 To connect to your Raspberry Pi, you'll need to know its IP address:
 
 1. Connect your Raspberry Pi to your network (via Ethernet or WiFi)
@@ -87,7 +87,7 @@ You can connect to your Raspberry Pi remotely using:
 #### Using PuTTY (Windows)
 1. Download and install PuTTY from: https://www.putty.org/
 2. Open PuTTY
-3. Enter your Raspberry Pi's IP address in the "Host Name" field
+3. Enter your Raspberry Pi IP address in the "Host Name" field
 4. Keep the port as 22
 5. Click "Open"
 6. Enter your Raspberry Pi username (default: pi) and password when prompted
@@ -144,7 +144,6 @@ USE sensordata;
 3. Create the required tables:
 
 ```sql
--- Table for BMP280 pressure sensor measurements
 CREATE TABLE `BMP280_measurement` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Date` timestamp NULL DEFAULT current_timestamp(),
@@ -152,7 +151,6 @@ CREATE TABLE `BMP280_measurement` (
   PRIMARY KEY (`ID`)
 ) 
 
--- Table for DHT11 temperature and humidity sensor measurements
 CREATE TABLE `DHT11_measurement` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Date` timestamp NULL DEFAULT current_timestamp(),
@@ -161,7 +159,6 @@ CREATE TABLE `DHT11_measurement` (
   PRIMARY KEY (`ID`)
 )
 
--- Table for user authentication
 CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(50) NOT NULL,
@@ -197,7 +194,7 @@ Alternatively, you can also use phpMyAdmin to create the database and tables:
 
 **Note on Security**: The current user table stores passwords in plain text, which is not secure for production. In a real-world application, you should use proper password hashing (e.g., bcrypt or Argon2).
 
-3. Create a website structure
+6. Create a website structure
 ```
 sudo mkdir /var/www/html/website
 cd /var/www/html/website
@@ -207,13 +204,13 @@ sudo nano logout.php
 sudo ln -s /usr/share/phpmyadmin /var/www/html/phpmyadmin
 ```  
 
-4. Set up a virtual environment:
+7. Set up a virtual environment:
 ```
 python3 -m /var/www/html/website .venv
 source /var/www/html/website/.venv/bin/activate
 ```
 
-5. Install Python dependencies:
+8. Install Python dependencies:
 ```
 pip install Flask
 pip install flask mysql-connector-python
