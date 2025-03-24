@@ -4,7 +4,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-//Remember to change it!
+#Remember to change it!
 db_config = {
     'user': 'root',      
     'password': 'raspberry',      
