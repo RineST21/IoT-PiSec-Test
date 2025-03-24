@@ -126,7 +126,7 @@ $conn->close();
 </head>
 <body>
   <div class="dashboard-container">
-    <h1>Sensor DASHBOARD</h1>
+    <h1>Sensor dashboard</h1>
     <table>
       <thead>
         <tr>
