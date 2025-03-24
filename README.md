@@ -4,76 +4,82 @@ This project creates a weather monitoring system using the ESP8266 to collect da
 
 ## Overview
 
-The system collects temperature, humidity, and pressure data using an ESP8266 microcontroller connected to DHT11 and BMP280 sensors. The data is transmitted to a Raspberry Pi server which stores it in a MariaDB database and provides a web interface for visualization.
+The system collects temperature, humidity, and pressure data using an ESP8266 microcontroller connected to DHT11 and BMP280 sensors. The data is transmitted to a Raspberry Pi server which stores it and provides visualisation.
 
-## Requirements:
+## Requirements
 
 ### Hardware
-* Raspberry Pi (any model) or similar device to use as a server
-* ESP8266 NodeMCU V3 microcontroller
-* DHT11 temperature and humidity sensor
-* BMP280 barometric pressure and temperature sensor
-* Connecting wires
-* Power supply for Raspberry Pi and ESP8266
+- Raspberry Pi (any model) or similar device to use as a server
+- ESP8266 NodeMCU V3 microcontroller
+- DHT11 temperature and humidity sensor
+- BMP280 barometric pressure and temperature sensor
+- Connecting wires
+- Power supply for Raspberry Pi and ESP8266
 
 ### Software
 
 #### Server Side (Raspberry Pi)
-* Python 3.x
-* Virtual Environment
-* Flask
-* MySQl server or another solution
-* MySQL connector for Python
-* Apache server
+- Python 3.x
+- Virtual Environment
+- Flask
+- MySQL server or another solution
+- MySQL connector for Python
+- Apache server
 
 #### Client Side (ESP8266)
-* Arduino IDE
-* ESP8266 board manager
-* DHT sensor library
-* BMP280 library
-* WiFi library
+- Arduino IDE
+- ESP8266 board manager
+- DHT sensor library
+- BMP280 library
+- WiFi library
 
 ## Setup Instructions
 
-### ESP8266 ArduinoIDE Configuration
+### ESP8266 Arduino IDE Configuration
+
 To enable programming and uploading code to the ESP8266 NODEMCU V3, you need to import the appropriate board in the board manager:
+
 1. Open Arduino IDE
-2. Go to File -> Preferences
+2. Go to `File -> Preferences`
 3. In the preferences window, find the "Additional boards manager URLs:" field
-4. Add the following URL: http://arduino.esp8266.com/stable/package_esp8266com_index.json
+4. Add the following URL: [http://arduino.esp8266.com/stable/package_esp8266com_index.json](http://arduino.esp8266.com/stable/package_esp8266com_index.json)
 5. Click OK to save the settings
-6. Go to Tools -> Board -> Boards Manager
+6. Go to `Tools -> Board -> Boards Manager`
 7. Search for "esp8266" and install the latest version of "ESP8266 by ESP8266 Community"
-8. After installation, select Tools -> Board -> ESP8266 Boards -> NodeMCU 1.0 (ESP-12E Module)
+8. After installation, select `Tools -> Board -> ESP8266 Boards -> NodeMCU 1.0 (ESP-12E Module)`
 
 ### Installing CP210x USB to UART Driver
+
 To enable communication between your computer and the ESP8266:
-1. Download the appropriate CP210x USB to UART Bridge VCP driver for your operating system from the Silicon Labs website: https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers
+
+1. Download the appropriate CP210x USB to UART Bridge VCP driver for your operating system from the [Silicon Labs website](https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers)
 2. Install the driver according to your operating system's procedure
 3. Restart your computer if necessary
 4. Connect your ESP8266 and check if it appears in the Device Manager (Windows) or using `ls /dev/tty*` (Mac/Linux)
-5. In Arduino IDE, select the correct COM port under Tools -> Port
+5. In Arduino IDE, select the correct COM port under `Tools -> Port`
 
 ### Installing Required Arduino Libraries
-1. Open Arduino IDE
-2. Go to Sketch -> Include Library -> Manage Libraries
-3. Search for and install the following libraries:
-  * DHT sensor library by Adafruit
-  * Adafruit Unified Sensor
-  * Adafruit BMP280 Library
-  * ESP8266WiFi
 
-## Setting Up the Raspberry Pi Server (database and www)
+1. Open Arduino IDE
+2. Go to `Sketch -> Include Library -> Manage Libraries`
+3. Search for and install the following libraries:
+   - DHT sensor library by Adafruit
+   - Adafruit Unified Sensor
+   - Adafruit BMP280 Library
+   - ESP8266WiFi
+
+## Setting Up the Raspberry Pi Server
 
 ### Finding Your Raspberry Pi IP Address
+
 To connect to your Raspberry Pi, you'll need to know its IP address:
 
 1. Connect your Raspberry Pi to your network (via Ethernet or WiFi)
 2. On the Raspberry Pi, open a terminal and type:
-   ```
-   hostname -I
-   ```
-   This will display the IP address(es) assigned to your Raspberry Pi
+```
+hostname -I
+```
+This will display the IP address(es) assigned to your Raspberry Pi
 
 Alternatively, you can check your router's connected devices list or use network scanning tools like:
 ```
@@ -82,7 +88,6 @@ nmap -sn 192.168.1.0/24  # Replace with your network range
 ```
 
 ### Connecting to Raspberry Pi via SSH
-You can connect to your Raspberry Pi remotely using:
 
 #### Using PuTTY (Windows)
 1. Download and install PuTTY from: https://www.putty.org/
@@ -149,7 +154,7 @@ CREATE TABLE `BMP280_measurement` (
   `Date` timestamp NULL DEFAULT current_timestamp(),
   `Pressure` float NOT NULL,
   PRIMARY KEY (`ID`)
-) 
+); 
 
 CREATE TABLE `DHT11_measurement` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -157,7 +162,7 @@ CREATE TABLE `DHT11_measurement` (
   `Temperature` float NOT NULL,
   `Humidity` float NOT NULL,
   PRIMARY KEY (`ID`)
-)
+);
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -165,7 +170,7 @@ CREATE TABLE `users` (
   `password` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) 
+);
 ```
 
 4. Add an initial admin user (for testing purposes only, change this in production):
@@ -194,7 +199,9 @@ Alternatively, you can also use phpMyAdmin to create the database and tables:
 
 **Note on Security**: The current user table stores passwords in plain text, which is not secure for production. In a real-world application, you should use proper password hashing (e.g., bcrypt or Argon2).
 
-6. Create a website structure
+### Creating the Website Structure
+
+1. Create a website structure:
 ```
 sudo mkdir /var/www/html/website
 cd /var/www/html/website
@@ -202,17 +209,17 @@ sudo nano index.php
 sudo nano dashboard.php
 sudo nano logout.php
 ```
-7. Issue one more command so that phpMyAdmin will be available at an easy-to-remember address, e.g: 192.168.1.32/phpmyadmin:
+2. Link phpMyAdmin for easy access:
 ```
 sudo ln -s /usr/share/phpmyadmin /var/www/html/phpmyadmin 
 ```  
-8. Set up a virtual environment:
+3. Set up a virtual environment:
 ```
 python3 -m /var/www/html/website .venv
 source /var/www/html/website/.venv/bin/activate
 ```
 
-9. Install Python dependencies:
+4. Install Python dependencies:
 ```
 pip install Flask
 pip install flask mysql-connector-python
