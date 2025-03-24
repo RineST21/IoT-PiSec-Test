@@ -202,7 +202,7 @@ sudo nano index.php
 sudo nano dashboard.php
 sudo nano logout.php
 ```
-7. issue one more command so that phpMyAdmin will be available at an easy-to-remember address, e.g: 192.168.1.32/phpmyadmin:
+7. Issue one more command so that phpMyAdmin will be available at an easy-to-remember address, e.g: 192.168.1.32/phpmyadmin:
 ```
 sudo ln -s /usr/share/phpmyadmin /var/www/html/phpmyadmin 
 ```  
