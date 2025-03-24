@@ -4,6 +4,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 
+//Remember to change it!
 db_config = {
     'user': 'root',      
     'password': 'raspberry',      
@@ -30,13 +31,13 @@ def receive_data():
             conn.commit()
             conn.close()
 
-            print(f"Odebrano: timestamp={timestamp}, temperature={temperature}, humidity={humidity}")
-            return "Dane zapisane pomyślnie", 200
+            print(f"Received: timestamp={timestamp}, temperature={temperature}, humidity={humidity}")
+            return "Data saved successfully", 200
         except Exception as e:
-            print(f"Błąd: {e}")
+            print(f"Error: {e}")
             return str(e), 500
     else:
-        return "Brak parametrów", 400
+        return "Missing parameters", 400
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
