@@ -201,16 +201,18 @@ cd /var/www/html/website
 sudo nano index.php
 sudo nano dashboard.php
 sudo nano logout.php
-sudo ln -s /usr/share/phpmyadmin /var/www/html/phpmyadmin
+```
+7. issue one more command so that phpMyAdmin will be available at an easy-to-remember address, e.g: 192.168.1.32/phpmyadmin:
+```
+sudo ln -s /usr/share/phpmyadmin /var/www/html/phpmyadmin 
 ```  
-
-7. Set up a virtual environment:
+8. Set up a virtual environment:
 ```
 python3 -m /var/www/html/website .venv
 source /var/www/html/website/.venv/bin/activate
 ```
 
-8. Install Python dependencies:
+9. Install Python dependencies:
 ```
 pip install Flask
 pip install flask mysql-connector-python
