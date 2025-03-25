@@ -1,58 +1,3 @@
-<?php
-ini_set('display_errors', 1);
-session_start();
-
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header('Location: index.php');
-    exit();
-}
-
-//Remember to change it!
-$host = 'localhost';
-$user = 'root';
-$password = 'raspberry';
-$dbname = 'sensordata';
-
-$conn = new mysqli($host, $user, $password, $dbname);
-if ($conn->connect_error) {
-    die("Connection error: " . $conn->connect_error);
-}
-
-$dhtQuery = "SELECT Date, Temperature, Humidity FROM DHT11_measurement";
-$dhtResult = $conn->query($dhtQuery);
-if (!$dhtResult) {
-    die("Error query (DHT11): " . $conn->error);
-}
-
-$data = [];
-while ($row = $dhtResult->fetch_assoc()) {
-    $data[$row['Date']] = $row;
-    $data[$row['Date']]['Pressure'] = '';
-}
-
-$bmpQuery = "SELECT Date, Pressure FROM BMP280_measurement";
-$bmpResult = $conn->query($bmpQuery);
-if (!$bmpResult) {
-    die("Error query (BMP280): " . $conn->error);
-}
-
-while ($row = $bmpResult->fetch_assoc()) {
-    $date = $row['Date'];
-    if (isset($data[$date])) {
-        $data[$date]['Pressure'] = $row['Pressure'];
-    } else {
-        $data[$date] = [
-            'Date' => $date,
-            'Temperature' => '',
-            'Humidity' => '',
-            'Pressure' => $row['Pressure']
-        ];
-    }
-}
-
-ksort($data);
-$conn->close();
-?>
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -95,9 +40,6 @@ $conn->close();
       color: #fff;
       text-align: center;
     }
-    th.numeric_2 {
-      text-align: left;
-    }
     td.numeric {
       text-align: center;
     }
@@ -122,42 +64,113 @@ $conn->close();
     .logout button:hover {
       background: #c82333;
     }
+    .pagination {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .pagination button {
+      background: #007BFF;
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      margin: 0 4px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .pagination button.active {
+      background: #0056b3;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
   <div class="dashboard-container">
     <h1>Sensor dashboard</h1>
-    <table>
+    <table id="sensorTable">
       <thead>
         <tr>
-          <th class="numeric_2">Data</th>
+          <th>Data</th>
           <th>Temperature (°C)</th>
           <th>Humidity (%RH)</th>
           <th>Pressure (hPa)</th>
         </tr>
       </thead>
       <tbody>
-        <?php
-          if (!empty($data)) {
-              foreach ($data as $row) {
-                  echo "<tr>";
-                  echo "<td>" . htmlspecialchars($row['Date']) . "</td>";
-                  echo "<td class='numeric'>" . htmlspecialchars($row['Temperature']) . "</td>";
-                  echo "<td class='numeric'>" . htmlspecialchars($row['Humidity']) . "</td>";
-                  echo "<td class='numeric'>" . htmlspecialchars($row['Pressure']) . "</td>";
-                  echo "</tr>";
-              }
-          } else {
-              echo "<tr><td colspan='4'>No data</td></tr>";
-          }
-        ?>
+        <tr><td colspan="4">Ładowanie danych...</td></tr>
       </tbody>
     </table>
+    <div class="pagination"></div>
     <div class="logout">
       <form action="logout.php" method="post">
         <button type="submit">Logout</button>
       </form>
     </div>
   </div>
+  <script>
+    let sensorData = [];
+    let currentPage = 1;
+    const rowsPerPage = 10;
+
+    function renderTable() {
+      const tbody = document.querySelector('#sensorTable tbody');
+      tbody.innerHTML = '';
+
+      const totalPages = Math.ceil(sensorData.length / rowsPerPage);
+      const startIndex = (currentPage - 1) * rowsPerPage;
+      const pageData = sensorData.slice(startIndex, startIndex + rowsPerPage);
+
+      if (pageData.length > 0) {
+        pageData.forEach(row => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${row.Date}</td>
+                          <td class="numeric">${row.Temperature}</td>
+                          <td class="numeric">${row.Humidity}</td>
+                          <td class="numeric">${row.Pressure}</td>`;
+          tbody.appendChild(tr);
+        });
+      } else {
+        tbody.innerHTML = "<tr><td colspan='4'>Brak danych</td></tr>";
+      }
+      renderPagination(totalPages);
+    }
+
+    function renderPagination(totalPages) {
+      const paginationDiv = document.querySelector('.pagination');
+      paginationDiv.innerHTML = '';
+
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        if (i === currentPage) {
+          btn.classList.add('active');
+        }
+        btn.addEventListener('click', () => {
+          currentPage = i;
+          renderTable();
+        });
+        paginationDiv.appendChild(btn);
+      }
+    }
+
+    function fetchData() {
+      fetch('data.php')
+        .then(response => {
+          if (!response.ok) throw new Error('Błąd sieci');
+          return response.json();
+        })
+        .then(data => {
+          sensorData = data;
+          const totalPages = Math.ceil(sensorData.length / rowsPerPage);
+          if (currentPage > totalPages) {
+            currentPage = totalPages;
+          }
+          renderTable();
+        })
+        .catch(error => console.error('Błąd pobierania danych:', error));
+    }
+    
+    setInterval(fetchData, 5000);
+    fetchData();
+  </script>
 </body>
 </html>
