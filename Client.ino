@@ -44,7 +44,7 @@ void setup() {
 void loop() {
   float humidity = dht.readHumidity();
   float temperature = dht.readTemperature();
-  float pressure = bmp.readPressure() / 100.0F; // convert from Pa to hPa
+  float pressure = bmp.readPressure() / 100.0F; 
 
   struct tm timeinfo;
   if (!getLocalTime(&timeinfo)) {
@@ -53,7 +53,7 @@ void loop() {
     return;
   }
   char timeStr[25];
-  strftime(timeStr, sizeof(timeStr), "%Y-%m-%d%%20%H:%M:%S", &timeinfo);  // URL encoded space as %20
+  strftime(timeStr, sizeof(timeStr), "%Y-%m-%d%%20%H:%M:%S", &timeinfo);  
   
   if (!isnan(humidity) && !isnan(temperature)) {
     Serial.print("Humidity: ");
