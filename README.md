@@ -6,6 +6,11 @@ This project creates a weather monitoring system using the ESP8266 to collect da
 
 The system collects temperature, humidity, and pressure data using an ESP8266 microcontroller connected to DHT11 and BMP280 sensors. The data is transmitted to a Raspberry Pi server which stores it and provides visualisation.
 
+![screenshot](Images/1.jpg)
+![screenshot](Images/2.jpg)
+![screenshot](Images/3.jpg)
+![screenshot](Images/4.jpg)
+
 ## Requirements
 
 ### Hardware
@@ -229,6 +234,9 @@ pip install flask mysql-connector-python
 1. Upload the Arduino sketch to ESP8266
 2. Start the Flask server on Raspberry Pi
 3. Access the web interface at http://[Raspberry_Pi_IP]:5000
+
+![screenshot](Images/login.png)
+![screenshot](Images/dashboard.png)
 
 ## Troubleshooting
 
