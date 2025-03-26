@@ -3,6 +3,7 @@
 #include <WiFiClient.h>
 #include <Wire.h>
 #include <Adafruit_BMP280.h>
+#include <time.h> 
 
 #define DHT11_PIN 0      
 #define DHT_TYPE DHT11   
@@ -15,6 +16,10 @@ const int serverPort = 5000;
 
 DHT dht(DHT11_PIN, DHT_TYPE);
 Adafruit_BMP280 bmp;  
+
+const char* ntpServer1 = "pool.ntp.org";
+const long  gmtOffset_sec = 0;
+const int   daylightOffset_sec = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -32,13 +37,24 @@ void setup() {
     Serial.print(".");
   }
   Serial.println(" Connected!");
+
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer1);
 }
 
 void loop() {
   float humidity = dht.readHumidity();
   float temperature = dht.readTemperature();
-  float pressure = bmp.readPressure() / 100.0F; 
+  float pressure = bmp.readPressure() / 100.0F; // convert from Pa to hPa
 
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo)) {
+    Serial.println("Failed to obtain time");
+    delay(1000);
+    return;
+  }
+  char timeStr[25];
+  strftime(timeStr, sizeof(timeStr), "%Y-%m-%d%%20%H:%M:%S", &timeinfo);  // URL encoded space as %20
+  
   if (!isnan(humidity) && !isnan(temperature)) {
     Serial.print("Humidity: ");
     Serial.print(humidity);
@@ -56,7 +72,8 @@ void loop() {
 
         String url = "/data?humidity=" + String(humidity) +
                      "&temperature=" + String(temperature) +
-                     "&pressure=" + String(pressure);
+                     "&pressure=" + String(pressure) +
+                     "&timestamp=" + String(timeStr);
                      
         client.print(String("GET ") + url + " HTTP/1.1\r\n" +
                      "Host: " + serverIP + "\r\n" +
