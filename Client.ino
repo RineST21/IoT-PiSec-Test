@@ -1,22 +1,30 @@
 #include "DHT.h"
 #include <ESP8266WiFi.h>
-#include <WiFiClient.h> 
+#include <WiFiClient.h>
+#include <Wire.h>
+#include <Adafruit_BMP280.h>
 
-#define DHT11_PIN 5      
+#define DHT11_PIN 0      
 #define DHT_TYPE DHT11   
 
-//change it to your WiFi configuration!
-const char* ssid = "your_ssid";         
-const char* password = "your_password";         
-const char* serverIP = "your_ip_address";       
-const int serverPort = 5000;                  
+// change these to your WiFi configuration!
+const char* ssid = "CGA2121_8EgD8ah";         
+const char* password = "X2EMZ5fZwZrBBnsCnQ";         
+const char* serverIP = "192.168.0.18";       
+const int serverPort = 5000;              
 
 DHT dht(DHT11_PIN, DHT_TYPE);
+Adafruit_BMP280 bmp;  
 
 void setup() {
   Serial.begin(9600);
   dht.begin();
 
+  if (!bmp.begin(0x76)) {  
+    Serial.println("BMP280 sensor not found. Check wiring!");
+    while (1);
+  }
+  
   WiFi.begin(ssid, password);
   Serial.print("Connecting to WiFi");
   while (WiFi.status() != WL_CONNECTED) {
@@ -29,20 +37,27 @@ void setup() {
 void loop() {
   float humidity = dht.readHumidity();
   float temperature = dht.readTemperature();
+  float pressure = bmp.readPressure() / 100.0F; 
 
   if (!isnan(humidity) && !isnan(temperature)) {
     Serial.print("Humidity: ");
     Serial.print(humidity);
-    Serial.print("%RH | Temperature: ");
+    Serial.print("% | Temperature: ");
     Serial.print(temperature);
-    Serial.println("°C ");
+    Serial.print("°C | Pressure: ");
+    Serial.print(pressure);
+    Serial.println(" hPa");
+    
     if (WiFi.status() == WL_CONNECTED) {
       WiFiClient client;
-
+      
       if (client.connect(serverIP, serverPort)) {
         Serial.println("Connected to server.");
 
-        String url = "/data?humidity=" + String(humidity) + "&temperature=" + String(temperature);
+        String url = "/data?humidity=" + String(humidity) +
+                     "&temperature=" + String(temperature) +
+                     "&pressure=" + String(pressure);
+                     
         client.print(String("GET ") + url + " HTTP/1.1\r\n" +
                      "Host: " + serverIP + "\r\n" +
                      "Connection: close\r\n\r\n");
@@ -64,10 +79,10 @@ void loop() {
         client.stop();
         Serial.println("\nConnection closed.");
       } else {
-        Serial.println("Failed to established connection.");
+        Serial.println("Failed to establish connection with server.");
       }
     } else {
-      Serial.println("No connection to WiFi.");
+      Serial.println("No WiFi connection.");
     }
   } else {
     Serial.println("Error reading data from DHT!");
